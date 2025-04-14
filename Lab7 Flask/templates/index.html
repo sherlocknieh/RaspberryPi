@@ -1,81 +1,73 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>主页</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-    </head>
-    <body>
-        <div class="container">
-            <h1>欢迎来到 树莓派控制系统</h1>
-            <p>选择以下选项导航到不同的功能模块。</p>
-            
-            <nav>
-                <ul>
-                    <li><a href="/motor">电机控制</a></li>
-                    <li><a href="/camera">摄像监控</a></li>
-                    <li><a href="/sensor">传感器数据</a></li>
-                </ul>
-            </nav>
-            
-            <h2>LED 控制</h2>
-            <div class="led-control">
-                <label class="switch">
-                    <input type="checkbox" id="ledToggle">
-                    <span class="slider round"></span>
-                </label>
-                <div class="switch-status">
-                    <span id="ledStatus">LED 已关闭</span>
-                </div>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LED 控制面板</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn {
+            margin: 10px;
+            min-width: 120px;
+        }
+
+        .brightness-control {
+            width: 300px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="mb-4">LED 控制面板</h1>
+        <div class="d-flex flex-column align-items-center">
+            <button class="btn btn-success" onclick="controlLED('on')">开灯</button>
+            <button class="btn btn-danger" onclick="controlLED('off')">关灯</button>
+            <button class="btn btn-warning" onclick="controlLED('blink')">闪烁</button>
+            <div class="brightness-control">
+                <label for="brightness" class="form-label">亮度调节</label>
+                <input type="range" class="form-range" id="brightness" min="0" max="100" value="100"
+                    onchange="adjustBrightness(this.value)">
             </div>
         </div>
-        
-        <footer>
-            &copy; 2023 树莓派控制系统 | 实验室项目
-        </footer>
+    </div>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const ledToggle = document.getElementById('ledToggle');
-                const ledStatus = document.getElementById('ledStatus');
-                
-                // 检查LED初始状态
-                fetch('/led/status')
-                    .then(response => response.json())
-                    .then(data => {
-                        ledToggle.checked = data.status === 'on';
-                        updateLedStatus();
-                    })
-                    .catch(error => console.error('获取LED状态失败:', error));
-                
-                ledToggle.addEventListener('change', function() {
-                    const action = this.checked ? 'on' : 'off';
-                    
-                    fetch(`/led/${action}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('LED状态更新:', data);
-                        updateLedStatus();
-                    })
-                    .catch(error => {
-                        console.error('LED控制失败:', error);
-                        // 如果发生错误，恢复开关状态
-                        this.checked = !this.checked;
-                        updateLedStatus();
-                    });
-                });
-                
-                function updateLedStatus() {
-                    ledStatus.textContent = ledToggle.checked ? 'LED 已打开' : 'LED 已关闭';
-                }
+    <script>
+        function controlLED(action) {
+            fetch('/led', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: action
+                })
             });
-        </script>
-    </body>
+        }
+
+        function adjustBrightness(value) {
+            fetch('/led', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'brightness',
+                    brightness: value / 100
+                })
+            });
+        }
+    </script>
+</body>
+
 </html>
