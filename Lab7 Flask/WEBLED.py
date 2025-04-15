@@ -5,8 +5,8 @@ app = Flask(__name__)
 led = PWMLED(27)
 
 @app.route('/')
-def index():
-    return render_template('index.html')
+def home():
+    return render_template('led.html')
 
 @app.route('/led', methods=['POST'])
 def led_control():
