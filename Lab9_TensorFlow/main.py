@@ -1,9 +1,27 @@
-from ServoGimbal import ServoGimbal
-from time import sleep
-# Create a servo gimbal object
-sg = ServoGimbal(14, 15)
+from modules.ImageClassifier import ImageClassifier
+from modules.object_detect import ObjectDetector
+from modules.WEBCAM import WEBCAM
 
-# Run the servo gimbal
-sg.move_to(0, 90)
-sleep(2)
-sg.release()
+# 创建对象检测器实例
+detector = ObjectDetector(
+    model_path='data/detect.tflite',
+    label_path='data/coco_labels.txt'
+)
+
+# 创建图像分类器
+classifier = ImageClassifier(
+    model_path='data/mobilenet_v1_1.0_224_quant.tflite',
+    label_path='data/labels_mobilenet_quant_v1_224.txt'
+)
+
+# 创建网络摄像头
+webcam = WEBCAM()
+
+# 添加物体分类处理器
+webcam.add_filters(classifier.classify_frame)
+
+# 添加物体检测处理器
+webcam.add_filters(detector.detect_frame)
+
+# 运行服务器
+webcam.run()
