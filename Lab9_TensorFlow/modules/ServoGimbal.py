@@ -1,5 +1,5 @@
-from gpiozero import AngularServo
 from gpiozero.pins.pigpio import PiGPIOFactory
+from gpiozero import AngularServo
 from time import sleep
 
 # 云台
@@ -24,12 +24,12 @@ class ServoGimbal:
             frame_width=20/1000        # 20ms
         )
 
+    # 释放资源
     def release(self):
         self.horizontal_servo.close()
         self.vertical_servo.close()
 
-
-    # 
+    # 云台控制
     def move_to(self, theta, phi):
         "theta: -90 ~ 90, 水平视角"
         "phi: -90 ~ 90, 仰视角"
@@ -39,6 +39,9 @@ class ServoGimbal:
 # 主程序
 if __name__ == "__main__":
     gimbal = ServoGimbal(14, 15)
-    gimbal.move_to(0, 90)
-    sleep(1)
-    gimbal.release()
+    try:
+        gimbal.move_to(0, 0)
+        sleep(1)
+    finally:
+        gimbal.release()
+        
