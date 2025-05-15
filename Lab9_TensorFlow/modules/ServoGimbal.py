@@ -25,14 +25,6 @@ class ServoGimbal:
         self.theta = 0
         self.phi = 0
 
-<<<<<<< HEAD
-    # 释放资源
-    def release(self):
-        self.horizontal_servo.close()
-        self.vertical_servo.close()
-
-=======
->>>>>>> origin/main
     # 云台控制
     def move_to(self, theta, phi):
         "theta: -90 ~ 90, 水平视角"
@@ -46,8 +38,8 @@ class ServoGimbal:
     def track_to(self, dx, dy):
         "dx: -200 ~ 200, 相对水平位移"
         "dy: -200 ~ 200, 相对仰视位移"
-        if abs(dx) > 50 and abs(dy) > 50:
-            self.move_to(self.theta - dx/10, self.phi - dy/10)
+        if abs(dx) > 20 and abs(dy) > 20:
+            self.move_to(self.theta - dx/50, self.phi + dy/50)
 
     # 释放资源
     def release(self):

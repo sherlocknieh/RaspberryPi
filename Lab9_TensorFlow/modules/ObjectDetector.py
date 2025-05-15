@@ -11,8 +11,8 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 import warnings
 warnings.filterwarnings('ignore', category=UserWarning)
 
-# import tflite_runtime.interpreter as tflite  # Raspberry PI
-import tensorflow.lite as tflite  # Windows
+import tflite_runtime.interpreter as tflite  # Raspberry PI
+# import tensorflow.lite as tflite  # Windows
 
 CAMERA_WIDTH = 640
 CAMERA_HEIGHT = 480
@@ -122,7 +122,7 @@ class ObjectDetector:
         frame = self.draw_results(frame, result)
 
         # 猫咪位置跟踪
-        result = (0,0)
+        offsets = (0, 0)
         for obj in result:
             if obj['_id'] == 16:  # cat id
                 pos = obj['pos']
@@ -135,9 +135,9 @@ class ObjectDetector:
                 offset_x = int(center_x - CAMERA_WIDTH / 2)
                 offset_y = -int(center_y - CAMERA_HEIGHT / 2)
                 print("cat offset: ", offset_x, offset_y)
-                result = (offset_x, offset_y)
+                offsets = (offset_x, offset_y)
 
-        return result,frame
+        return offsets, frame
 
 if __name__ == "__main__":
 
