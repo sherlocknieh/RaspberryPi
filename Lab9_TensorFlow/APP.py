@@ -11,7 +11,7 @@ offsets = Deque(maxlen=5)
 
 camera = Camera()
 camera.open()
-servo = ServoGimbal(horizontal_pin=18, vertical_pin=17)
+servo = ServoGimbal(14, 15)
 detector = ObjectDetector(
     model_path='data/detect.tflite', 
     label_path='data/coco_labels.txt'
