@@ -6,6 +6,10 @@ import re
 import cv2
 import numpy as np
 from PIL import Image
+import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+import warnings
+warnings.filterwarnings('ignore', category=UserWarning)
 
 # import tflite_runtime.interpreter as tflite  # Raspberry PI
 import tensorflow.lite as tflite  # Windows
@@ -116,27 +120,41 @@ class ObjectDetector:
         
         # 绘制结果
         frame = self.draw_results(frame, result)
-        return frame
+
+        # 猫咪位置跟踪
+        result = (0,0)
+        for obj in result:
+            if obj['_id'] == 16:  # cat id
+                pos = obj['pos']
+                print("cat position: ", pos)
+                # 计算猫中心点坐标
+                center_x = int((pos[1] + pos[3]) / 2 * CAMERA_WIDTH)
+                center_y = int((pos[0] + pos[2]) / 2 * CAMERA_HEIGHT)
+                print("cat center: ", center_x, center_y)
+                # 计算猫中心点偏离屏幕中心点的坐标
+                offset_x = int(center_x - CAMERA_WIDTH / 2)
+                offset_y = -int(center_y - CAMERA_HEIGHT / 2)
+                print("cat offset: ", offset_x, offset_y)
+                result = (offset_x, offset_y)
+
+        return result,frame
 
 if __name__ == "__main__":
 
-    model_path = 'data/detect.tflite'
-    label_path = 'data/coco_labels.txt'
+    detector = ObjectDetector(
+        model_path = 'data/detect.tflite',
+        label_path = 'data/coco_labels.txt'
+        )
 
     cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAMERA_WIDTH)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAMERA_HEIGHT)
-    cap.set(cv2.CAP_PROP_FPS, 15)
-
-    detector = ObjectDetector(model_path, label_path)
-
-    # Process Stream
+    pos = None
     while True:
         ret, frame = cap.read()
 
-        frame = detector.detect_frame(frame)
-        cv2.imshow('Object Detection', frame)
+        result,frame = detector.detect_frame(frame)
+        
 
+        cv2.imshow('Object Detection', frame)
         key = cv2.waitKey(1)
         if key == 27:  # esc
             break
