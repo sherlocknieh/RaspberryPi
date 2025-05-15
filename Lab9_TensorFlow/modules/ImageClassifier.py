@@ -5,7 +5,9 @@ For Raspberry PI, please use `import tflite_runtime.interpreter as tflite` inste
 import cv2
 import numpy as np
 from PIL import Image
-import tflite_runtime.interpreter as tflite
+
+# import tflite_runtime.interpreter as tflite  # Raspberry PI
+import tensorflow.lite as tflite  # Windows
 
 CAMERA_WIDTH = 640
 CAMERA_HEIGHT = 480
