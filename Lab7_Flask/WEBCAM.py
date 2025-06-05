@@ -20,11 +20,15 @@ def stream():
 def gen_frames():
     # 打开摄像头
     cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("无法打开摄像头")
+        exit()
     while True:
         # 读取帧
-        success, frame = cap.read()
-        if not success:
-            break  # 如果读取失败，退出循环
+        ret, frame = cap.read()
+        if not ret:
+            print("无法读取帧")
+            break
         else:
             # 将图像编码为JPEG格式
             ret, buffer = cv2.imencode('.jpg', frame)
